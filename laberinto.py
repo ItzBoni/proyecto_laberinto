@@ -105,7 +105,8 @@ class Maze:
         # Agregr la coordenada actual al camino
         # Esto es como cuando la función enlistar agregaba nodos a la lista
         self.path.append((row, col))
-        
+        self.dfs_path.append((row, col))
+
         # Caso espectacular: Pisamos B 🦅🦅🔥🔥🔥🥶🥶
         if self.matrix[row][col] == 'B':
             self.found = True  # Marcamos que encontramos la solución
@@ -142,13 +143,11 @@ class Maze:
         
         # Si después de explorar todas las direcciones no se encuentra ninguna solución, hay que quitar esa coordenada del camino (backtracking)
         # Esto es crucial para DFS: si este camino no funciona, lo descartamos
+
         if not self.found:
             self.path.pop()  # Removemos la última coordenada agregada (tu no has visto nada..., diría Skipper)
             # Nota: No hay que quitar el "ya visitado" porque ya pasamos por ahí y puede tender a recorrer ese camino 'legalmente' de manera indefinida. Le tienta irse por ahí
         
-        self.dfs_path = self.path
-
-
     # Algoritmo para el BFS
     def bfs_solve(self):
 
@@ -211,6 +210,12 @@ class Maze:
             coord_string = f"({row},{col})" # Formateamos la coordenada como string
             path_strings.append(coord_string) # Agregamos el string a la lista
         
+        print("DFS search path: ", self.dfs_path)
+        dfs_search_strings = [] # Lista vacía para guardar los strings
+        for row, col in self.dfs_path: # Por cada coordenada en el camino
+            coord_string = f"({row},{col})" # Formateamos la coordenada como string
+            dfs_search_strings.append(coord_string) # Agregamos el string a la lista
+       
         bfs_path_strings = []
         for row, col in self.bfs_result: # Por cada coordenada en el camino
             coord_string = f"({row},{col})" # Formateamos la coordenada como string
@@ -222,13 +227,16 @@ class Maze:
             bfs_search_strings.append(coord_string) # Agregamos el string a la lista
         
         # Appendeamos todas las coordenadas con guiones
+        dfs_search_path = "-".join(dfs_search_strings)
         path_good = "-".join(path_strings)
         path_bfs_good = "-".join(bfs_path_strings)
         bfs_search_path = "-".join(bfs_search_strings)
         
+        
         # Imprimimos el resultado
         print(f"Camino: {path_good}")
-        print(f"Camino de búsqueda BFS: {bfs_search_path}")
+        #print(f"Camino de búsqueda DFS: {dfs_search_path}")
+        #print(f"Camino de búsqueda BFS: {bfs_search_path}")
 
     def get_dfs_path(self):
         return self.path
@@ -273,6 +281,52 @@ class Maze:
             sleep(0.5)
             pygame.display.update()
 
+        for i in range(self.height):
+            lista = list()
+            for j in range(self.width):
+                pos = (rect_height*i,rect_width*j,rect_height,rect_width)
+
+                match self.matrix[i][j]:
+                    case "0":
+                        lista.append(pygame.draw.rect(pantalla,white,pos))
+                    case "1":
+                        lista.append(pygame.draw.rect(pantalla,black,pos))
+                    case "A":
+                        lista.append(pygame.draw.rect(pantalla,red,pos))
+                    case "B":
+                        lista.append(pygame.draw.rect(pantalla,green,pos))
+
+        for i in range(len(self.dfs_path)):
+            print(i)
+            m,n = self.dfs_path[i]
+            pos = (rect_height*m,rect_width*n,rect_height,rect_width)    
+            pygame.draw.rect(pantalla, turquoise, pos)
+            sleep(0.5)
+            pygame.display.update()
+
+        for i in range(self.height):
+            lista = list()
+            for j in range(self.width):
+                pos = (rect_height*i,rect_width*j,rect_height,rect_width)
+
+                match self.matrix[i][j]:
+                    case "0":
+                        lista.append(pygame.draw.rect(pantalla,white,pos))
+                    case "1":
+                        lista.append(pygame.draw.rect(pantalla,black,pos))
+                    case "A":
+                        lista.append(pygame.draw.rect(pantalla,red,pos))
+                    case "B":
+                        lista.append(pygame.draw.rect(pantalla,green,pos))
+
+        for i in range(len(self.path)):
+            print(i)
+            m,n = self.path[i]
+            pos = (rect_height*m,rect_width*n,rect_height,rect_width)    
+            pygame.draw.rect(pantalla, turquoise, pos)
+            sleep(0.5)
+            pygame.display.update()
+
         while True:
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
@@ -299,6 +353,4 @@ result = maze.solve()
 
 # Imprime el camino (Alcaraz quiere las coordenadas separadas por guiones)
 maze.print_path()
-
 maze.main()
-print(maze.bfs_path)
